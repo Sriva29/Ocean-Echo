@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM 015 - TextureActive HUD - Code Creativity</title>
+
+<!-- zimjs.com - JavaScript Canvas Framework -->
+
+<script type="module">
+
+import zim from "https://zimjs.org/cdn/015/zim_three"; // includes three.js R155
+
+// See Docs under Frame for FIT, FILL, FULL, and TAG
+new Frame(FIT, 1024, 768, black, black, ready);
+function ready() {
+    
+    // Given F, S, W, H for frame, stage, stageW, stageH 
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ZIM - https://zimjs.com
+
+    // ZIM is a JavaScript Canvas framework with many conveniences, components and controls 
+    // used for making UI, games, puzzles, animations, art, data visualization, e-learning apps, etc.
+    // ZIM is one of the most complete 2D Canvas frameworks in existence and simple to code.
+    // We can now use ZIM as a texture on a canvas material in three.js.
+    // We have provided a TextureActive() class whose canvas can be mapped onto a mesh material.
+    // There is TextureActives() class that raycasts from the meshes to the ZIM objects.
+    // The materials can be animated and are fully interactive! 
+
+    // USES 
+    // TextureActive objects can be used for interfaces like menus and huds
+    // including over 40 exciting components that can easily be used to control three.js objects
+    // TextureActive objects can be animated, wrapped around geometries and mapped onto models
+    // 2D games and puzzles can be placed on textures 
+    
+    // MANAGEMENT 
+    // TextureActives has an optional hot key (default T) that toggles between your three.js scene and the ZIM objects
+    // A slider or swiping can be used to pan through the TextureActive objects 
+    // These can be interacted with and are completely in-sync with the material in the three.js scene 
+    // allowing you to quickly test your work. 
+    // In general, the TextureActive objects can be be added to the ZIM stage during their creation 
+    // This can be done before the three.js is made - or the three.js can be commented out - or worked on in a separate file
+    // or the T key can be used to toggle to see results but this would usually be done during fine tuning.
+
+    // TEXTUREACTIVE
+    // TextureActive is a ZIM DisplayObject that extends a ZIM Page - which is just a Container with a background Rectangle
+    // You make one TextureActive per three.js CanvasTexture
+    // Note that a mesh can have multiple materials and these can be mapped to different TextureActive objects
+    // Also, if applied to say a box or cylinder, all sides will be TextureActive objects
+    // so a materials array can be used to make only one side a TextureActive object if desried 
+    // There is an option to set TextureActive objects to animated and to interactive - both these default to true
+    // but if you only need animated then set interactive to false and if no animation is needed then set animated to false
+    // TextureActive comes with a backing property that by default will receive orbitControls 
+    // whereas interactive elements will override orbitControls and their raycast passed into ZIM
+    // The backing will automatically prevent firstPersonControls from moving as well
+    // You then add any ZIM DisplayObjects to the TextureActive to show on the texture.
+    // This includes, shapes, interactive blobs and squiggles, particle emitters, phsyics, a pen, tiles,
+    // components like sliders, buttons, dials, labels, steppers, indicators, lists, tabs, color pickers, etc. 
+
+    // EXAMPLES
+    // https://zimjs.com/015/textureactive.html - panel with various components
+    // https://zimjs.com/015/textureactive_raw.html - same but without ZIM Three
+    // https://zimjs.com/015/textureactive2.html - first person interactive cylinders
+    // https://zimjs.com/015/textureactive3.html - model with scrambler
+    // https://zimjs.com/015/textureactive4.html - HUD, Noise, Synth
+    // https://zimjs.com/015/textureactive5.html - Physics
+    // https://zimjs.com/015/textureactive_hud.html - HUD affecting three object
+    // https://zimjs.com/015/textureactive_hud_raw.html - same but without ZIM Three 
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // CURRENT APP 
+
+
+    // ~~~~~~~~~~~~~~~~~~ HUD COMPONENTS
+
+    // LOGO
+    
+    const logo = new TextureActive(400, 155, clear).addTo();
+    
+    TextureActive.makeLogo("light", true)
+        .scaleTo(logo,100)
+        .pos(0,0,CENTER,TOP,logo)
+        .tap(()=>{
+            textureActivesOrtho.manager.toggle();
+        });
+    const checkBox = new CheckBox({label:"HUD", color:white, rtl:true, startChecked:true})
+        .sca(.75)
+        .pos(5,0,LEFT,BOTTOM,logo)
+        .change(()=>{
+            if (checkBox.checked) sceneOrtho.add(hud);
+            else sceneOrtho.remove(hud);
+        });
+
+    // COLORS
+    const colors = new TextureActive(500,100,clear)
+    const cp = new ColorPicker({
+        colors:[pink, blue, orange, yellow, green],
+        cols:5,
+        spacing:12,
+        backgroundColor:clear,
+        circles:true
+    })
+        .scaleTo(colors,100,100)
+        .center(colors)
+        .change(()=>{
+            animate({
+                target:knot,
+                props:{color:cp.selectedColor},
+                time:.7
+            });
+        });
+    
+    // SPEED 
+    const speed = new TextureActive({
+        width:500,
+        height:100,
+        color:blue.toAlpha(.1),
+        color2:blue.toAlpha(.5),
+        angle:90,
+        borderColor:white,
+        borderWidth:3,
+        backingOrbit:false
+    });   
+
+    // warning triangle
+    new Triangle(speed.width*.7, speed.height*.7, -1, "red".toAlpha(.4), null, null, [0,8,6])
+        .pos(15,0,RIGHT,CENTER,speed);
+
+    const slider = new Slider({
+        min:0,
+        max:20,
+        barColor:light,
+        currentValue:3,
+        button:"circle"
+    })
+        .scaleTo(speed,90,80)
+        .center(speed)       
+        .change(()=>{
+            knot.rate = slider.currentValue;
+        });
+
+    
+     // POSITION 
+     const positions = [{x:150,y:150,z:300}, {x:0,y:0,z:150}, {x:-20,y:800,z:50}];
+     const position = new TextureActive(300, 100, clear);
+     const tabs = new Tabs({ 
+        tabs:[1,2,3], 
+        bgColor:black.toAlpha(.8), 
+        color:white, 
+        selectedBgColor:white.toAlpha(.8), 
+        selectedColor:black, 
+        rollBgColor:pink.toAlpha(.8), 
+        spacing:15, 
+        corner:[30,0,30,0],
+        currentEnabled:true
+    })
+        .scaleTo(position,100,100)
+        .center(position)
+        .change(()=>{
+            let p = positions[tabs.selectedIndex];
+            animate({
+                target:camera,
+                props:{
+                    "position.x":p.x,
+                    "position.y":p.y,
+                    "position.z":p.z
+                },       
+                animateCall:()=>{camera.lookAt(0,0,0);}
+            });
+            
+        });
+
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // THREEJS
+   
+    // Three() comes from the ZIM three helper module
+    // to make renderer, scene and camera 
+    // Traditionally, this module helps bring threejs into ZIM ;-) 
+    // but we can still use the module to help make setting up easier
+    // It also comes with OrbitControls, FirstPersonControls and GLTFLoader
+    // This is optional - see https://zimjs.com/015/textureActive_raw.html for without Three()
+   
+    const three = new Three({
+        width:window.innerWidth, 
+        height:window.innerHeight, 
+        cameraPosition:new THREE.Vector3(150,150,300),
+        ortho:true,
+        textureActive:true,
+        colorManagement:true
+    });
+    
+    const scene = three.scene;
+    const camera = three.camera;
+    const renderer = three.renderer;
+
+    // for HUD
+    const sceneOrtho = three.sceneOrtho;
+    const cameraOrtho = three.cameraOrtho;
+
+
+    // SKYBOX
+    const skyTexture = new THREE.TextureLoader().load("assets/nebula.jpg");
+    const skyBoxGeometry = new THREE.SphereGeometry(100000, 32, 32);
+    const skyBoxMaterial = new THREE.MeshBasicMaterial({map:skyTexture, side:THREE.BackSide});
+    const skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+    scene.add(skyBox);
+
+    // CONTROLS
+    // https://threejs.org/docs/#examples/en/controls/OrbitControls
+    const controls = new OrbitControls(camera, three.canvas);
+    controls.enableDamping = true;
+	controls.dampingFactor = 0.1;
+    three.preRender = ()=>{controls.update();}
+ 
+    const knotGeometry = new THREE.TorusKnotGeometry(60, 2, 400, 16, 8, 1); 
+    const knotMaterial = new THREE.MeshPhongMaterial({color: pink}); 
+    const knot = new THREE.Mesh(knotGeometry, knotMaterial); 
+    knot.scale.z = 5;
+    scene.add(knot);
+
+    animate({
+        target:knot,
+        props:{"rotation.z":360*RAD},
+        time:3,
+        loop:true,
+        ease:"linear"
+    });  
+    // animate will add a rate property which can be used to control the animation rate - 1 is normal, 2 is twice as fast, etc.
+    knot.rate = slider.currentValue; 
+
+
+    // LIGHTS 
+    // do not use the variable, light, as it will overwrite ZIM color light
+    // you can force zim namespace with zns=true in a script before loading ZIM
+    // but it is annoying to put zim.Frame, zim.Circle, zim.red, etc.
+    // Also see https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733
+    // Also, if using a SpotLight then set the decay = 0
+    
+    const light1 = new THREE.DirectionalLight(0xffffff, 1*Math.PI);
+    light1.position.set(100,200,100);
+    scene.add(light1);
+    
+    const light2 = new THREE.AmbientLight(0xffffff, .5*Math.PI);
+    scene.add(light2);
+
+
+    // TEXTUREACTIVES
+    // Create manager for TextureActive objects - see https://zimjs.com/docs.html?item=TextureActives
+    // use the t key to toggle to the actual ZIM canvas - can prevent this with toggleKey:-1 or choose another key
+    // Note we optionally set the active layer to 1 so that means we need to match the layer when adding meshes later on
+    // Parameters are actives, threejs, zimThree, renderer, scene, camera, controls, layers, near, far, ignoreList, toggleKey
+
+    const textureActivesOrtho = new TextureActives([logo, speed, colors, position], THREE, three, renderer, sceneOrtho, cameraOrtho, controls, 1);
+    // textureActivesOrtho.manager.toggleKey = -1; // turn off the toggle key
+
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // SCENEORTHO - TextureActive work on sceneOrtho with HUD
+
+    // HUD 
+    // When TextureActive is to be mapped on a Plane, we can use the ZIM Three makePanel() method 
+    // Parameters are textureActive, textureActives, scale (default .5), curve, opacity, material, colorSpace
+    // If the TextureActives object has layers set, the mesh layer automatically will match the first layer set
+    
+    // pos() has x, y, horizontal, vertical, gutter parameters
+    // with gutter being the minimum the left and right will squeeze together (to prevent crossing one another)
+
+    const HUD_logo = three.makePanel(logo, textureActivesOrtho).pos(35,35,LEFT,TOP,500);
+    sceneOrtho.add(HUD_logo); 
+
+    // Add HUD to group so can easily remove and add with HUD CheckBox
+    const hud = new THREE.Group();
+    sceneOrtho.add(hud);
+
+        // COLORS 
+        const HUD_colors = three.makePanel(colors, textureActivesOrtho).pos(35,35,RIGHT,BOTTOM,600);
+        hud.add(HUD_colors); 
+
+        // SPEED 
+        const HUD_speed = three.makePanel(speed, textureActivesOrtho).pos(35,35,LEFT,BOTTOM,600);
+        hud.add(HUD_speed); 
+
+        // POSITION 
+        const HUD_position = three.makePanel(position, textureActivesOrtho).pos(35,35,RIGHT,TOP,500);
+        hud.add(HUD_position); 
+
+    
+
+    // THROTTLE TEST
+    // on some older mobiles updating the cache constantly can bog at 60 fps
+    let fps; const fpsT = Ticker.add(()=>{fps = Ticker.getFPS();});
+    timeout(2, ()=>{if (fps < 50) {Ticker.setFPS(30);}; Ticker.remove(fpsT);});
+            
+}
+
+</script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body><script>
+    var r=Math.round(Math.random()*1000000);
+    document.write('<img src=/cgi-bin/traffic_plus?company=danzen&page=zimTextureActivesHud&r='+r+' width=1 height=1>');
+    </script></body>
+</html>
