@@ -8,14 +8,11 @@
 
 <script type="module">
 
-// import zim from "https://zimjs.org/cdn/015/zim_three"; // includes three.js R155
-// import { OBJLoader } from three;
-
-import GLTFLoader  from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
 import zim from "zimjs"
-// import * as THREE from "three" 
+import * as THREE from "three" 
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { Three } from "@zimjs/three"
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 new Frame(FIT, 1024, 768, black, black, ready);
 function ready() {
@@ -45,8 +42,8 @@ if (three.success) {
         // const scene = three.scene;
 // FISH
 
-    const loader = new GLTFLoader();
-    // const loader = new OBJLoader();
+    // const loader = new GLTFLoader();
+    const loader = new OBJLoader();
     
     // loader.load('assets/fish1.glb', (gltf) => {
     //     const fish = gltf.scene;    
@@ -65,7 +62,7 @@ if (three.success) {
     // }, undefined, function(error) {
     //     console.error(error);
     // });
-    loader.load('assets/fishy.glb', (gltf) => {
+    loader.load('assets/fish1/mullet_fish_RPT191417109.obj', (gltf) => {
         const fish1 = gltf.scene;    
 
         fish1.position.set(0, 0, -50);
