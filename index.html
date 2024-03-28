@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<title>Ocean's Echo</title>
+
+<script type="module">
+
+// import zim from "https://zimjs.org/cdn/015/zim_three"; // includes three.js R155
+// import { OBJLoader } from three;
+
+import GLTFLoader  from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
+import zim from "zimjs"
+// import * as THREE from "three" 
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import { Three } from "@zimjs/three"
+
+new Frame(FIT, 1024, 768, black, black, ready);
+function ready() {
+// THREE.JS
+const three = new Three({
+        width:window.innerWidth, 
+        height:window.innerHeight, 
+        cameraPosition:new THREE.Vector3(0,0,100),
+        ortho:true,
+        textureActive:true
+    });
+
+if (three.success) {
+    const scene = three.scene;
+    const camera = three.camera;
+    const renderer = three.renderer;
+
+//SKYBOX
+    const skyTexture = new THREE.TextureLoader().load("assets/ocean-1.jpeg"); //maybe 3, 4 is too busy
+    const skyBoxGeometry = new THREE.SphereGeometry(100000, 32, 32);
+    const skyBoxMaterial = new THREE.MeshBasicMaterial({map:skyTexture, side:THREE.BackSide});
+    const skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+    scene.add(skyBox);
+
+// CONTROLS
+    const controls = new OrbitControls(camera, three.canvas);
+        // const scene = three.scene;
+// FISH
+
+    const loader = new GLTFLoader();
+    // const loader = new OBJLoader();
+    
+    // loader.load('assets/fish1.glb', (gltf) => {
+    //     const fish = gltf.scene;    
+
+    //     fish.position.set(0, 0, -50);
+    //     scene.add(fish);
+        
+    //     animate({
+    //         target: fish,
+    //         props: {x: 100},
+    //         time: 2000,
+    //         loop: true,
+    //         rewind: true,
+    //         ease: "quadInOut"
+    //     });
+    // }, undefined, function(error) {
+    //     console.error(error);
+    // });
+    loader.load('assets/fishy.glb', (gltf) => {
+        const fish1 = gltf.scene;    
+
+        fish1.position.set(0, 0, -50);
+        scene.add(fish1);
+        
+        animate({
+            target: fish1,
+            props: {x: 100},
+            time: 2000,
+            loop: true,
+            rewind: true,
+            ease: "quadInOut"
+        });
+    }, undefined, function(error) {
+        console.error(error);
+    });
+
+    const light1 = new THREE.DirectionalLight(0xffffff, 2*Math.PI);
+    light1.position.set(0,250,100);
+    scene.add(light1);
+    const light2 = new THREE.DirectionalLight(0xffffff, 2*Math.PI);
+    light2.position.set(100,250,-100);
+    scene.add(light2);
+
+} else {
+    // WEBGL NOT SUPPORTED
+    const pane = new Pane(W+100, 200, "SORRY - NEEDS WEBGL", light);
+    pane.show();
+}
+
+
+//End of ready
+}
+</script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body>
+<script>
+    // traffic plus
+    //  1x1 pixel image to track page views
+    // var r=Math.round(Math.random()*1000000);
+    // document.write('<img src=/cgi-bin/traffic_plus?company=danzen&page=zimTextureActivesHud&r='+r+' width=1 height=1>');
+</script>
+</body>
+</html>

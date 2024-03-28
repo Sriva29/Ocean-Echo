@@ -1,0 +1,15 @@
+{
+  "name": "ocean-echo",
+  "version": "1.0.0",
+  "description": "An Ocean's Echo - Will we listen or is it too late?",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.162.0",
+    "zimjs": "^16.2.6"
+  }
+}
