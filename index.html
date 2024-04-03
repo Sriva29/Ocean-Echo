@@ -6,7 +6,9 @@
 <title>Ocean's Echo</title>
 <script type="module">
 import zim from "https://zimjs.org/cdn/015/zim_three";
-new Frame(FIT, 1024, 768, black, black, ready);
+const assets = ["underwater.mp3", "underwater-music.mp3", "ocean-1.jpeg"];
+const path = "assets/";
+new Frame(FIT, 1024, 768, black, black, ready, assets, path);
 function ready() {
     
 const three = new Three({
@@ -92,6 +94,41 @@ const underwaterMusic = new Audio('assets/underwater-music.mp3');
 // })
 // // .center().mov(0, 200).show();
 
+// let fishCollection = [];
+
+// function addFish(scene, originalFish, amountToAdd) {
+//     for (let i = 0; i < amountToAdd; i++) {
+//         const newFish = originalFish.clone(); // Clone the original fish model
+//         newFish.position.set(Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50); // Random position
+//         newFish.scale.set(15, 15, 15); // Adjust scale if necessary
+//         scene.add(newFish);
+//         fishCollection.push(newFish);
+//         animateFish(newFish); // Call the animate function for the new fish
+//     }
+// }
+
+// // Function to remove fish
+// function removeFish(scene, amountToRemove) {
+//     for (let i = 0; i < amountToRemove; i++) {
+//         if (fishCollection.length === 0) break; // Exit if no fish to remove
+//         const fishToRemove = fishCollection.pop(); // Remove the last fish from the collection
+//         scene.remove(fishToRemove);
+//         // Dispose of the fish geometry and material if they won't be used again
+//     }
+// }
+
+// // Change event for the slider
+// slider.change(() => {
+//     const desiredCount = slider.currentValue; // Assuming slider values are integers
+//     const currentCount = fishCollection.length;
+//     const difference = desiredCount - currentCount;
+
+//     if (difference > 0) {
+//         addFish(scene, fishModel, difference); // `fishModel` should be a reference to your loaded fish model
+//     } else if (difference < 0) {
+//         removeFish(scene, -difference);
+//     }
+// });
 
 // After loading the fish
 loader.load('assets/man-o-war.glb', function(gltf) {
@@ -125,12 +162,41 @@ scene.add(light2);
 // Texture Active
    // PANEL
    const panel = new TextureActive({
-      width:W,
-      height:H,
-      color:white.toAlpha(.8),
-      corner:20
+      width:W*0.2,
+      height:H*0.2,
+    //   backgroundColor:"blue",
+    //   color:white.toAlpha(.8),
+    //   corner:20
    });
-   const circle = new Circle(100,red).center(panel).drag();
+panel.sca(0.5) // scale the panel
+const sliderPanel = new TextureActive({
+    width:W*0.4,
+    height:H*0.03,
+    // backgroundColor:"blue",
+    color:white.toAlpha(.8),
+    // corner:20
+    });
+
+   const instruction = new Label({
+      text:"Drag the Circle",
+      size:12,
+      color:white,
+      font:"arial",
+      align:"center"
+   }).center(panel);
+const button = new Button(100,50, "Play").center(panel).mov(0, 50);
+button.tap(()=>{
+    underwaterAmbience.play();
+    underwaterMusic.play();
+    zog("play");
+    button.removeFrom()
+})
+
+const slider = new Slider({step:1})
+   .center(sliderPanel)
+   .change(() => {
+      zog(slider.currentValue); // 0-10 in steps of 1
+   });
 
    // BACK OF PANEL
 const backing = new TextureActive({
@@ -142,23 +208,13 @@ animated:false,
 interactive:false
 });
 TextureActive.makeBacking(backing.width, backing.height).addTo(backing); // CANVAS WINDOW
-
-   const three = new Three({
-width:window.innerWidth,
-height:window.innerHeight,
-cameraPosition:new THREE.Vector3(0,0,500),
-textureActive:true
-});
-
+const textureActives2 = new TextureActives([sliderPanel, backing], THREE, three, renderer, scene, camera, controls, 1, 0, 1500);
 const textureActives = new TextureActives([panel, backing], THREE, three, renderer, scene, camera, controls, 1, 0, 1500);
-
-// can capture raydown, raymove, rayup, rayover and rayout
-textureActives.on("raymove", e=>{
-// zog(e.intersect.distance);
-});
-
+// const textureActives = new TextureActives([panel, backing], THREE, three, renderer, scene, camera, controls, 1, 0, 1500);
+const canvasWindow2 = three.makePanel(sliderPanel, textureActives);
 const canvasWindow = three.makePanel(panel, textureActives);
 scene.add(canvasWindow);
+scene.add(canvasWindow2);
 
 // BACK OF PANEL
 const canvasWindowBacking = three.makePanel(backing, textureActives, true, .5) // transparent and alpha
