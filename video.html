@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hologram Video Layout</title>
+<style>
+  .container {
+    position: relative;
+    width: 1920px; /* Calculated Width */
+    height: 1080px; /* Calculated Height based on 16:9 aspect ratio */
+    margin: auto; /* Center the container */
+    background-color: #000; /* Added a background color for better contrast */
+  }
+  video {
+    position: absolute;
+    width: 720px; /* Video Width */
+    height: 1280px; /* Video Height */
+    outline: 2px solid red; /* Outline added for visualization */
+  }
+  #videoTop {
+    bottom: 50%; /* Align to top with gap */
+    left: 50%;
+    transform: translate(-50%, 50%) rotateX(180deg);
+  }
+  #videoRight {
+    left: 50%; /* Align to right with gap */
+    top: 50%;
+    transform: translate(-50%, -50%) rotateY(180deg);
+  }
+  #videoBottom {
+    top: 50%; /* Align to bottom with gap */
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  #videoLeft {
+    right: 50%; /* Align to left with gap */
+    top: 50%;
+    transform: translate(50%, -50%) rotateY(180deg);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <video id="videoTop" src="assets/fish.mp4" autoplay loop muted></video> -->
+  <video id="videoRight" src="assets/fish.mp4" autoplay loop muted></video>
+  <!-- <video id="videoBottom" src="assets/fish.mp4" autoplay loop muted></video> -->
+  <!-- <video id="videoLeft" src="assets/fish.mp4" autoplay loop muted></video>
+</div>
+
+</body>
+</html>
